@@ -1,0 +1,9 @@
+[package]
+name = "cargo-playground"
+version = "0.1.0"
+authors = ["Lutetium Vanadium"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.3"
+watchexec = "1.14.1"
