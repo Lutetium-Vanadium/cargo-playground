@@ -91,7 +91,6 @@ pub fn watch(project_id: &str) {
         .build()
         .unwrap();
 
-    // FIXME: Deal with these better
-    let handler = CwHandler::new(args, project_id).unwrap();
-    watchexec::watch(&handler).unwrap();
+    let handler = CwHandler::new(args, project_id).expect("Failed to create CwHandler");
+    watchexec::watch(&handler).expect("Failed to watch source files");
 }

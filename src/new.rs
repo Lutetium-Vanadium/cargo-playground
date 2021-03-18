@@ -26,11 +26,12 @@ pub fn create(opts: NewOpts) -> io::Result<()> {
     let name = opts.name.unwrap_or_else(|| {
         let time = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
-            .expect("Current time is unix epoch!");
-        time.as_secs().to_string()
+            .expect("current time is unix epoch!");
+
+        format!("playground-{}", time.as_secs())
     });
 
-    println!("Creating new project: {}", name);
+    println!("creating new project: {}", name);
 
     let mut path = super::get_dir();
     path.push(&name);
@@ -43,20 +44,28 @@ pub fn create(opts: NewOpts) -> io::Result<()> {
     {
         return Err(io::Error::new(
             io::ErrorKind::Other,
-            "Could not create cargo project",
+            "could not create cargo project",
         ));
     }
 
     path.push("Cargo.toml");
     let mut cargo_toml = fs::OpenOptions::new().append(true).open(&path)?;
-    cargo_toml.write_all(b"\n")?;
     for dep in opts.deps {
         let mut parts = dep.split('=');
-        let dep_name = parts.next().unwrap();
-        let dep_ver = parts.next().unwrap_or("*");
+        let dep_name = parts.next().unwrap().trim();
+        let dep_ver = parts.next().unwrap_or("*").trim();
 
-        // FIXME: Deal with this better
         assert!(parts.next().is_none(), "Invalid dependency");
+        if parts.next().is_none() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!(
+                    "dependency '{}' is in an incorrect format
+dependencies must either be '<dep-name>' or '<dep-name>=<dep-version>'",
+                    dep
+                ),
+            ));
+        }
 
         writeln!(cargo_toml, "{} = \"{}\"", dep_name, dep_ver)?;
     }
@@ -65,5 +74,6 @@ pub fn create(opts: NewOpts) -> io::Result<()> {
         editor: opts.editor,
         args: opts.args,
         name,
+        skip_check: true,
     })
 }

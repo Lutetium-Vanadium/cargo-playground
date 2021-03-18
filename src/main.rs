@@ -8,10 +8,24 @@ mod watch;
 
 #[derive(StructOpt, Debug)]
 /// Make and use playgrounds locally.
+#[structopt(bin_name = "cargo", usage = "cargo playground <SUBCOMMAND>")]
 enum Opts {
+    // FIXME: See if this can be hidden from help message
+    /// Internal command required for running the playground -- good idea not to use it
+    Watch {
+        playground_id: String,
+    },
+    Playground(PlaygroundOpts),
+}
+
+#[derive(StructOpt, Debug)]
+/// Make and use playgrounds locally.
+enum PlaygroundOpts {
     /// Creates a new playground
+    // Override the default because it include '--editor <editor>'
+    #[structopt(usage = "cargo playground new [OPTIONS] [--] [dependencies]...")]
     New(new::NewOpts),
-    /// Creates a new playground
+    /// Opens an already existing playground
     Open(open::OpenOpts),
     /// List currently existing playgrounds
     Ls,
@@ -30,31 +44,32 @@ fn main() {
 }
 
 fn run() -> io::Result<()> {
-    let args: Vec<_> = env::args().collect();
+    let opts = Opts::from_args();
 
-    // FIXME: See if this can be moved into Opts without a help message being displayed for it
-    // This can technically be accessed from the binary, but it would not be a good idea to use it
-    // since it may easily crash if the setup isn't exactly how it expects.
-    if let Some("__watch") = args.get(1).map(String::as_str) {
-        watch::watch(&args[2]);
+    let opts = match opts {
+        Opts::Playground(opts) => opts,
+        Opts::Watch { playground_id } => {
+            watch::watch(&playground_id);
 
-        return Ok(());
-    }
-
-    let opts = Opts::from_iter(args);
+            return Ok(());
+        }
+    };
 
     if env::var_os("TMUX").is_none() {
-        eprintln!("Currently only terminals running tmux are supported");
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            "currently only terminals running tmux are supported",
+        ));
     }
 
     match opts {
-        Opts::New(opts) => {
+        PlaygroundOpts::New(opts) => {
             new::create(opts)?;
         }
-        Opts::Open(opts) => {
+        PlaygroundOpts::Open(opts) => {
             open::open(opts)?;
         }
-        Opts::Ls => {
+        PlaygroundOpts::Ls => {
             let path = get_dir();
             if !path.exists() {
                 return Ok(());
