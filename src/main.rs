@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use std::{env, io};
 use structopt::StructOpt;
 
+mod error;
 mod new;
 mod open;
 mod watch;
@@ -36,14 +37,16 @@ fn get_dir() -> PathBuf {
 }
 
 fn main() {
-    // FIXME: print errors in a better format
+    #[cfg(target_os = "windows")]
+    ansi_term::enable_ansi_support();
+
     match run() {
         Ok(()) => {}
-        Err(e) => eprintln!("{:?}", e),
+        Err(e) => eprintln!("{}", e),
     }
 }
 
-fn run() -> io::Result<()> {
+fn run() -> error::Result<()> {
     let opts = Opts::from_args();
 
     let opts = match opts {
@@ -56,7 +59,7 @@ fn run() -> io::Result<()> {
     };
 
     if env::var_os("TMUX").is_none() {
-        return Err(io::Error::new(
+        return Err(error::Error::new(
             io::ErrorKind::Other,
             "currently only terminals running tmux are supported",
         ));

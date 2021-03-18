@@ -1,3 +1,4 @@
+use crate::error;
 use std::io::Write;
 use std::process::Command;
 use std::time::SystemTime;
@@ -22,19 +23,24 @@ pub struct NewOpts {
     deps: Vec<String>,
 }
 
-pub fn create(opts: NewOpts) -> io::Result<()> {
-    let name = opts.name.unwrap_or_else(|| {
-        let time = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .expect("current time is unix epoch!");
+pub fn create(opts: NewOpts) -> error::Result<()> {
+    let name = match opts.name {
+        Some(name) => name,
+        None => {
+            let time = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .map_err(|_| {
+                    error::Error::new(io::ErrorKind::Other, "current time is unix epoch!")
+                })?;
 
-        format!("playground-{}", time.as_secs())
-    });
+            format!("playground-{}", time.as_secs())
+        }
+    };
 
     println!("creating new project: {}", name);
 
     let mut path = super::get_dir();
-    path.push(&name);
+    path.push(&name); // Now represents the playground directory
 
     if !Command::new("cargo")
         .arg("new")
@@ -42,29 +48,25 @@ pub fn create(opts: NewOpts) -> io::Result<()> {
         .status()?
         .success()
     {
-        return Err(io::Error::new(
+        return Err(error::Error::new(
             io::ErrorKind::Other,
             "could not create cargo project",
         ));
     }
 
-    path.push("Cargo.toml");
+    path.push("Cargo.toml"); // Now represents path to Cargo.toml
     let mut cargo_toml = fs::OpenOptions::new().append(true).open(&path)?;
     for dep in opts.deps {
         let mut parts = dep.split('=');
         let dep_name = parts.next().unwrap().trim();
         let dep_ver = parts.next().unwrap_or("*").trim();
 
-        assert!(parts.next().is_none(), "Invalid dependency");
-        if parts.next().is_none() {
-            return Err(io::Error::new(
+        if parts.next().is_some() {
+            return Err(error::Error::new(
                 io::ErrorKind::InvalidInput,
-                format!(
-                    "dependency '{}' is in an incorrect format
-dependencies must either be '<dep-name>' or '<dep-name>=<dep-version>'",
-                    dep
-                ),
-            ));
+                format!("dependency '{}' is in an incorrect format", dep),
+            )
+            .with_help("dependencies must either be '<dep-name>' or '<dep-name>=<dep-version>'"));
         }
 
         writeln!(cargo_toml, "{} = \"{}\"", dep_name, dep_ver)?;

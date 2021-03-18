@@ -1,4 +1,5 @@
-use std::path::{Path, PathBuf};
+use crate::error;
+use std::path::Path;
 use std::process::Command;
 use std::{env, io};
 use structopt::StructOpt;
@@ -17,18 +18,18 @@ pub struct OpenOpts {
     pub skip_check: bool,
 }
 
-pub fn open(opts: OpenOpts) -> io::Result<()> {
+pub fn open(opts: OpenOpts) -> error::Result<()> {
     let mut path = super::get_dir();
-    path.push(&opts.name);
+    path.push(&opts.name); // Now represents playground path
 
     if !opts.skip_check && !path.is_dir() {
-        return Err(io::Error::new(
+        return Err(error::Error::new(
             io::ErrorKind::NotFound,
-            format!(
-                "could not find playground with name {:?}
-help: use `cargo playground ls` to list available playgrounds",
-                path,
-            ),
+            format!("could not find playground with name {:?}", path),
+        )
+        .with_help(
+            "use `cargo playground ls` to list available playgrounds
+       or `cargo playground new` to create a new playground",
         ));
     }
 
@@ -56,7 +57,7 @@ help: use `cargo playground ls` to list available playgrounds",
     let mut editor = Command::new(opts.editor);
 
     editor.current_dir(&path);
-    let mut path = PathBuf::new();
+    path.clear(); // Now represents path to entrypoint (main.rs)
 
     path.push("src");
     path.push("main.rs");

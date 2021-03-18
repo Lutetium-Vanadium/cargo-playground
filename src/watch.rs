@@ -50,7 +50,10 @@ impl<'a> CwHandler<'a> {
     }
 
     fn start(&self) {
-        println!("[Project {}]", self.project_id);
+        println!(
+            "project: {}",
+            ansi_term::Style::new().bold().paint(self.project_id)
+        );
     }
 }
 
