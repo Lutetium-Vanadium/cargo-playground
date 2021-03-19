@@ -1,8 +1,13 @@
 use crate::error;
-use std::path::Path;
-use std::process::Command;
-use std::{env, io};
+use std::io;
+use std::path::{Path, PathBuf};
 use structopt::StructOpt;
+
+mod tmux;
+
+trait OpenBackend {
+    fn run(path: PathBuf, opts: OpenOpts) -> error::Result<()>;
+}
 
 #[derive(StructOpt, Debug)]
 pub struct OpenOpts {
@@ -35,42 +40,7 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
 
     println!("opening project: {}", opts.name);
 
-    let cd_project = format!("cd {}", path_to_str(&path, "playground")?);
-
-    let self_path = env::current_exe()?;
-    let watch_cmd = format!(
-        "{} && {} watch {}",
-        cd_project,
-        path_to_str(&self_path, "cargo-playground")?,
-        opts.name
-    );
-
-    #[rustfmt::skip]
-    Command::new("tmux")
-        .args(&[
-            "split-window", "-h", ";",                              // Create a right pane,
-            "send-keys", &cd_project, "&&", &watch_cmd, "C-m", ";", // watch the project files
-            "select-pane", "-L",                                    // and focus the editor
-        ])
-        .output()?;
-
-    let mut editor = Command::new(opts.editor);
-
-    editor.current_dir(&path);
-    path.clear(); // Now represents path to entrypoint (main.rs)
-
-    path.push("src");
-    path.push("main.rs");
-
-    editor.args(opts.args).arg(&path).status()?;
-
-    #[rustfmt::skip]
-    Command::new("tmux").args(&[
-        "select-pane", "-R", ";",                    // Select the right pane
-        "send-keys", "C-c", "tmux kill-pane", "C-m", // and kill it
-    ]).output()?;
-
-    Ok(())
+    tmux::Tmux::run(path, opts)
 }
 
 fn path_to_str<'a>(path: &'a Path, path_name: &str) -> io::Result<&'a str> {
