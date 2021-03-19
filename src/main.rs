@@ -67,7 +67,7 @@ fn run() -> error::Result<()> {
 
     match opts {
         PlaygroundOpts::New(opts) => {
-            new::create(opts)?;
+            new::new(opts)?;
         }
         PlaygroundOpts::Open(opts) => {
             open::open(opts)?;

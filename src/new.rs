@@ -23,7 +23,7 @@ pub struct NewOpts {
     deps: Vec<String>,
 }
 
-pub fn create(opts: NewOpts) -> error::Result<()> {
+pub fn new(opts: NewOpts) -> error::Result<()> {
     let name = match opts.name {
         Some(name) => name,
         None => {
