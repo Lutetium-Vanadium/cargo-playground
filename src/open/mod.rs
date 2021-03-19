@@ -7,7 +7,7 @@ mod gui;
 mod tmux;
 
 trait OpenBackend {
-    fn run(path: PathBuf, name: &str, opts: crate::EditorOpts) -> error::Result<()>;
+    fn run(&mut self, path: PathBuf, name: &str, opts: crate::EditorOpts) -> error::Result<()>;
 }
 
 #[derive(StructOpt, Debug)]
@@ -16,6 +16,9 @@ pub struct OpenOpts {
     pub(crate) editor_opts: super::EditorOpts,
     /// The name of the playground to open
     pub(crate) name: String,
+    /// Do not pass -w flag when opening GUI editor
+    #[structopt(long, requires("gui"))]
+    pub(crate) no_w: bool,
     /// Indicates the editor is a gui editor
     #[structopt(short, long)]
     pub gui: bool,
@@ -40,10 +43,10 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
 
     if opts.gui {
         println!("opening project: {}", opts.name);
-        gui::Gui::run(path, &opts.name, opts.editor_opts)
+        gui::Gui::new(opts.no_w).run(path, &opts.name, opts.editor_opts)
     } else if env::var_os("TMUX").is_some() {
         println!("opening project: {}", opts.name);
-        tmux::Tmux::run(path, &opts.name, opts.editor_opts)
+        tmux::Tmux.run(path, &opts.name, opts.editor_opts)
     } else {
         Err(error::Error::new(
             io::ErrorKind::Other,

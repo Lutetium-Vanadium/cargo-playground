@@ -1,3 +1,7 @@
+// A lot of this is taken from cargo-watch (https://github.com/passcod/cargo-watch/).
+//
+// It has been copied here so cargo-playground can be used without cargo-watch needing to be
+// installed
 use std::path::MAIN_SEPARATOR;
 use watchexec::{
     cli::{Args, ArgsBuilder},

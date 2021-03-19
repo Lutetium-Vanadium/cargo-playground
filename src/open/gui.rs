@@ -5,10 +5,18 @@ use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
-pub struct Gui;
+pub struct Gui {
+    no_w: bool,
+}
+
+impl Gui {
+    pub fn new(no_w: bool) -> Self {
+        Self { no_w }
+    }
+}
 
 impl OpenBackend for Gui {
-    fn run(mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
+    fn run(&mut self, mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
         let self_path = env::current_exe()?;
         let mut watch_child = Command::new(self_path)
             .current_dir(&path)
@@ -24,7 +32,11 @@ impl OpenBackend for Gui {
         path.push("src");
         path.push("main.rs");
 
-        editor.args(opts.args).arg(&path).status()?;
+        if !self.no_w {
+            editor.arg("-w");
+        }
+
+        editor.args(opts.args).arg(&path).output()?;
 
         // Ignore error if user already killed it
         let _ = watch_child.kill();

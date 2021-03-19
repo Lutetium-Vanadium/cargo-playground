@@ -12,6 +12,9 @@ pub struct NewOpts {
     name: Option<String>,
     #[structopt(flatten)]
     editor_opts: super::EditorOpts,
+    /// Do not pass -w flag when opening GUI editor
+    #[structopt(long, requires("gui"))]
+    no_w: bool,
     /// Indicates the editor is a gui editor
     #[structopt(short, long)]
     gui: bool,
@@ -74,6 +77,7 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
     open::open(open::OpenOpts {
         name,
         gui: opts.gui,
+        no_w: opts.no_w,
         skip_check: true,
         editor_opts: opts.editor_opts,
     })

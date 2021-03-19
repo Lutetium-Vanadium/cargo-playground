@@ -8,7 +8,7 @@ use std::process::Command;
 pub struct Tmux;
 
 impl OpenBackend for Tmux {
-    fn run(mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
+    fn run(&mut self, mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
         let cd_project = format!("cd {}", path_to_str(&path, "playground")?);
 
         let self_path = env::current_exe()?;

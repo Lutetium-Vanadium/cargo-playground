@@ -24,11 +24,14 @@ enum Opts {
 enum PlaygroundOpts {
     /// Creates a new playground
     // Override the default because it include '--editor <editor>'
-    #[structopt(usage = "cargo playground new [OPTIONS] [--] [dependencies]...")]
+    #[structopt(usage = "cargo playground new [FLAGS] [OPTIONS] [--] [dependencies]...")]
     New(new::NewOpts),
     /// Opens an already existing playground
+    // Override the default because it include '--editor <editor>'
+    #[structopt(usage = "cargo playground open [FLAGS] [OPTIONS] <name>")]
     Open(open::OpenOpts),
     /// List currently existing playgrounds
+    #[structopt(alias = "list")]
     Ls,
 }
 
