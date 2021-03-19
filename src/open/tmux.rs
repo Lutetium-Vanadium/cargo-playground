@@ -9,12 +9,10 @@ pub struct Tmux;
 
 impl OpenBackend for Tmux {
     fn run(&mut self, mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
-        let cd_project = format!("cd {}", path_to_str(&path, "playground")?);
-
         let self_path = env::current_exe()?;
         let watch_cmd = format!(
-            "{} && {} watch {}",
-            cd_project,
+            "cd {} && {} watch {}",
+            path_to_str(&path, "playground")?,
             path_to_str(&self_path, "cargo-playground")?,
             name
         );
@@ -22,9 +20,9 @@ impl OpenBackend for Tmux {
         #[rustfmt::skip]
         Command::new("tmux")
             .args(&[
-                "split-window", "-h", ";",                              // Create a right pane,
-                "send-keys", &cd_project, "&&", &watch_cmd, "C-m", ";", // watch the project files
-                "select-pane", "-L",                                    // and focus the editor
+                "split-window", "-h", ";",           // Create a right pane,
+                "send-keys", &watch_cmd, "C-m", ";", // watch the project files
+                "select-pane", "-L",                 // and focus the editor
             ])
             .output()?;
 
