@@ -93,3 +93,5 @@ This lists all the playgrounds.
 
 If you want to add specific for some editor or environment feel free to
 open a PR!
+
+#### Credits to Sergey Potalov and his post [Rust Playground At Your Fingertips](https://www.greyblake.com/blog/2021-03-12-rust-playground-at-your-fingertips/) for the inspiration!
