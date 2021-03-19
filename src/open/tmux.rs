@@ -1,5 +1,6 @@
-use super::{path_to_str, OpenBackend, OpenOpts};
+use super::{path_to_str, OpenBackend};
 use crate::error;
+use crate::EditorOpts;
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -7,7 +8,7 @@ use std::process::Command;
 pub struct Tmux;
 
 impl OpenBackend for Tmux {
-    fn run(mut path: PathBuf, opts: OpenOpts) -> error::Result<()> {
+    fn run(mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
         let cd_project = format!("cd {}", path_to_str(&path, "playground")?);
 
         let self_path = env::current_exe()?;
@@ -15,7 +16,7 @@ impl OpenBackend for Tmux {
             "{} && {} watch {}",
             cd_project,
             path_to_str(&self_path, "cargo-playground")?,
-            opts.name
+            name
         );
 
         #[rustfmt::skip]

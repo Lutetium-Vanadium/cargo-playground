@@ -32,6 +32,16 @@ enum PlaygroundOpts {
     Ls,
 }
 
+#[derive(StructOpt, Debug)]
+struct EditorOpts {
+    #[structopt(short, long, env = "VISUAL", hide_env_values = true)]
+    /// The editor to open the project in
+    pub editor: String,
+    #[structopt(short, long)]
+    /// Extra args (if any) to be supplied to the editor
+    pub args: Vec<String>,
+}
+
 fn get_dir() -> PathBuf {
     env::temp_dir().join("cargo-playground")
 }

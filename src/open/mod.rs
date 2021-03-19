@@ -6,21 +6,17 @@ use structopt::StructOpt;
 mod tmux;
 
 trait OpenBackend {
-    fn run(path: PathBuf, opts: OpenOpts) -> error::Result<()>;
+    fn run(path: PathBuf, name: &str, opts: crate::EditorOpts) -> error::Result<()>;
 }
 
 #[derive(StructOpt, Debug)]
 pub struct OpenOpts {
-    #[structopt(short, long, env = "VISUAL", hide_env_values = true)]
-    /// The editor to open the project in
-    pub editor: String,
-    #[structopt(short, long)]
-    /// Extra args (if any) to be supplied to the editor
-    pub args: Vec<String>,
+    #[structopt(flatten)]
+    pub(crate) editor_opts: super::EditorOpts,
     /// The name of the playground to open
-    pub name: String,
+    pub(crate) name: String,
     #[structopt(skip = false)]
-    pub skip_check: bool,
+    pub(crate) skip_check: bool,
 }
 
 pub fn open(opts: OpenOpts) -> error::Result<()> {
@@ -40,7 +36,7 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
 
     println!("opening project: {}", opts.name);
 
-    tmux::Tmux::run(path, opts)
+    tmux::Tmux::run(path, &opts.name, opts.editor_opts)
 }
 
 fn path_to_str<'a>(path: &'a Path, path_name: &str) -> io::Result<&'a str> {

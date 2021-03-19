@@ -1,4 +1,4 @@
-use crate::error;
+use crate::{error, open};
 use std::io::Write;
 use std::process::Command;
 use std::time::SystemTime;
@@ -10,12 +10,8 @@ pub struct NewOpts {
     #[structopt(short, long)]
     /// The name of the playground to create. If not supplied, the current timestamp will be used
     name: Option<String>,
-    #[structopt(short, long, env = "VISUAL", hide_env_values = true)]
-    /// The editor to open the project in
-    editor: String,
-    #[structopt(short, long)]
-    /// Extra args (if any) to be supplied to the editor
-    args: Vec<String>,
+    #[structopt(flatten)]
+    editor_opts: super::EditorOpts,
     /// The dependencies to add. It must be in the following format:
     /// 1. <dep-name>
     /// 2. <dep-name>=<dep-version>
@@ -72,10 +68,9 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
         writeln!(cargo_toml, "{} = \"{}\"", dep_name, dep_ver)?;
     }
 
-    crate::open::open(crate::open::OpenOpts {
-        editor: opts.editor,
-        args: opts.args,
+    open::open(open::OpenOpts {
         name,
         skip_check: true,
+        editor_opts: opts.editor_opts,
     })
 }
