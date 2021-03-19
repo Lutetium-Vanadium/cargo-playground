@@ -34,11 +34,11 @@ enum PlaygroundOpts {
 
 #[derive(StructOpt, Debug)]
 struct EditorOpts {
-    #[structopt(short, long, env = "VISUAL", hide_env_values = true)]
     /// The editor to open the project in
+    #[structopt(short, long, env = "VISUAL", hide_env_values = true)]
     pub editor: String,
-    #[structopt(short, long)]
     /// Extra args (if any) to be supplied to the editor
+    #[structopt(short, long)]
     pub args: Vec<String>,
 }
 

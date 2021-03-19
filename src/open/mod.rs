@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use std::{env, io};
 use structopt::StructOpt;
 
-mod regular;
+mod gui;
 mod tmux;
 
 trait OpenBackend {
@@ -16,9 +16,9 @@ pub struct OpenOpts {
     pub(crate) editor_opts: super::EditorOpts,
     /// The name of the playground to open
     pub(crate) name: String,
-    /// Force start the playground
+    /// Indicates the editor is a gui editor
     #[structopt(short, long)]
-    pub force: bool,
+    pub gui: bool,
     #[structopt(skip = false)]
     pub(crate) skip_check: bool,
 }
@@ -38,9 +38,9 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
         ));
     }
 
-    if opts.force {
+    if opts.gui {
         println!("opening project: {}", opts.name);
-        regular::Regular::run(path, &opts.name, opts.editor_opts)
+        gui::Gui::run(path, &opts.name, opts.editor_opts)
     } else if env::var_os("TMUX").is_some() {
         println!("opening project: {}", opts.name);
         tmux::Tmux::run(path, &opts.name, opts.editor_opts)

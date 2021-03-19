@@ -5,9 +5,9 @@ use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
-pub struct Regular;
+pub struct Gui;
 
-impl OpenBackend for Regular {
+impl OpenBackend for Gui {
     fn run(mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
         let self_path = env::current_exe()?;
         let mut watch_child = Command::new(self_path)
