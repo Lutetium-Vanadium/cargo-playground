@@ -20,13 +20,13 @@ $ cargo install --path .
 
 A few examples:
 ```
-# Create a new project
+# Create a new playground
 $ cargo playground new -n test-playground rand
 
-# List existing projects
+# List existing playgrounds
 $ cargo playground ls
 
-# Open an existing project
+# Open an existing playground
 $ cargo playground open -e vim -a=-o2 test-playground
 ```
 
@@ -69,14 +69,12 @@ This lists all the playgrounds.
 
 ## Support
 
-- Terminal based editor + tmux:
-  It opens a pane to the right which has the output process, and the
-  editor will be open to the left. When the editor is closed, the
-  playground will be closed.
+- Terminal based editor + tmux: It opens a pane to the right which has
+  the output process, and the editor will be open to the left. When the
+  editor is closed, the playground will be closed.
 
-- GUI based editors:
-  This requires the extra flag `-g/--gui`. It shows the output process
-  in the main terminal and opens the editor.
+- GUI based editors: This requires the extra flag `-g/--gui`. It shows
+  the output process in the main terminal and opens the editor.
 
   > Any output from the editor to stdout/stdin will be ignored and not
   > shown.
