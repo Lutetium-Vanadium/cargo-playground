@@ -12,6 +12,9 @@ pub struct NewOpts {
     name: Option<String>,
     #[structopt(flatten)]
     editor_opts: super::EditorOpts,
+    #[structopt(short, long)]
+    /// Force start the playground
+    force: bool,
     /// The dependencies to add. It must be in the following format:
     /// 1. <dep-name>
     /// 2. <dep-name>=<dep-version>
@@ -70,6 +73,8 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
 
     open::open(open::OpenOpts {
         name,
+        // FIXME: we create a project without even checking if we can open it
+        force: opts.force,
         skip_check: true,
         editor_opts: opts.editor_opts,
     })

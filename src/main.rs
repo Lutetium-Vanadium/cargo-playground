@@ -1,5 +1,5 @@
+use std::env;
 use std::path::PathBuf;
-use std::{env, io};
 use structopt::StructOpt;
 
 mod error;
@@ -67,13 +67,6 @@ fn run() -> error::Result<()> {
             return Ok(());
         }
     };
-
-    if env::var_os("TMUX").is_none() {
-        return Err(error::Error::new(
-            io::ErrorKind::Other,
-            "currently only terminals running tmux are supported",
-        ));
-    }
 
     match opts {
         PlaygroundOpts::New(opts) => {

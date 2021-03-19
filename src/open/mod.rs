@@ -1,8 +1,9 @@
 use crate::error;
-use std::io;
 use std::path::{Path, PathBuf};
+use std::{env, io};
 use structopt::StructOpt;
 
+mod regular;
 mod tmux;
 
 trait OpenBackend {
@@ -15,6 +16,9 @@ pub struct OpenOpts {
     pub(crate) editor_opts: super::EditorOpts,
     /// The name of the playground to open
     pub(crate) name: String,
+    /// Force start the playground
+    #[structopt(short, long)]
+    pub force: bool,
     #[structopt(skip = false)]
     pub(crate) skip_check: bool,
 }
@@ -34,9 +38,19 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
         ));
     }
 
-    println!("opening project: {}", opts.name);
-
-    tmux::Tmux::run(path, &opts.name, opts.editor_opts)
+    if opts.force {
+        println!("opening project: {}", opts.name);
+        regular::Regular::run(path, &opts.name, opts.editor_opts)
+    } else if env::var_os("TMUX").is_some() {
+        println!("opening project: {}", opts.name);
+        tmux::Tmux::run(path, &opts.name, opts.editor_opts)
+    } else {
+        Err(error::Error::new(
+            io::ErrorKind::Other,
+            "currently only terminals running tmux are supported",
+        )
+        .with_help("try using the --force flag with a GUI editor"))
+    }
 }
 
 fn path_to_str<'a>(path: &'a Path, path_name: &str) -> io::Result<&'a str> {
