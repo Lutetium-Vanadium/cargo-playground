@@ -16,6 +16,10 @@ $ cd cargo-playground
 $ cargo install --path .
 ```
 
+> `cargo-playground` on crates.io was already registered to someone else
+> as a dummy project, and is not this project. Please install only using
+> the above methods.
+
 ## Usage
 
 A few examples:
