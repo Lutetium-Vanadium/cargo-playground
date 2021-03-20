@@ -46,7 +46,9 @@ struct EditorOpts {
 }
 
 fn get_dir() -> PathBuf {
-    env::temp_dir().join("cargo-playground")
+    env::var_os("CARGO_PLAYGROUND_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| env::temp_dir().join("cargo-playground"))
 }
 
 fn main() {
