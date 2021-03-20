@@ -11,7 +11,8 @@ impl OpenBackend for Tmux {
     fn run(&mut self, mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
         let self_path = env::current_exe()?;
         let watch_cmd = format!(
-            "cd {} && {} watch {}",
+            // Space is intentionally present to prevent this from going into shell history
+            " cd {} && {} watch {}",
             path_to_str(&path, "playground")?,
             path_to_str(&self_path, "cargo-playground")?,
             name
@@ -38,8 +39,10 @@ impl OpenBackend for Tmux {
 
         #[rustfmt::skip]
         Command::new("tmux").args(&[
-            "select-pane", "-R", ";",                    // Select the right pane
-            "send-keys", "C-c", "tmux kill-pane", "C-m", // and kill it
+            "select-pane", "-R", ";",                     // Select the right pane
+            "send-keys", "C-c", " tmux kill-pane", "C-m", // and kill it
+            //                   ^-- Space is intentionally present to prevent this from going into
+            //                       shell history
         ]).output()?;
 
         Ok(())
