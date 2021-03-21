@@ -34,9 +34,20 @@ $ cargo playground ls
 $ cargo playground open -e vim -a=-o2 test-playground
 ```
 
+#### Environment variables
+
+The following environment variables are used:
+
+- `VISUAL`: The editor in which to open the playground. It is required
+  unless --editor is given
+
+- `CARGO_PLAYGROUND_DIR`: The path to the directory which is used for
+  creating playgrounds. If not set, the temp directory is used. eg: in
+  unix: `/tmp/cargo-playground/`
+
 #### `cargo playground new`
 
-This creates and opens a new playground in the `/tmp/cargo-playground/<name>`
+This creates and opens a new playground.
 
 It has the following options and flags:
 ```
@@ -70,6 +81,16 @@ It has the following options and flags:
 #### `cargo playground ls`
 
 This lists all the playgrounds.
+
+#### `cargo playground clean`
+
+Deletes the Cargo projects in the playground directory.
+
+It has the following options:
+```
+ -m, --matches <matches> A regex to match against playground names. If
+                         not given all will be deleted.
+```
 
 ## Support
 

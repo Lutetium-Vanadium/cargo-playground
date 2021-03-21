@@ -2,6 +2,7 @@ use std::env;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
+mod clean;
 mod error;
 mod new;
 mod open;
@@ -30,6 +31,8 @@ enum PlaygroundOpts {
     // Override the default because it include '--editor <editor>'
     #[structopt(usage = "cargo playground open [FLAGS] [OPTIONS] <name>")]
     Open(open::OpenOpts),
+    /// Cleans the playgrounds directory, deleting all cargo projects in it.
+    Clean(clean::CleanOpts),
     /// List currently existing playgrounds
     #[structopt(alias = "list")]
     Ls,
@@ -46,7 +49,9 @@ struct EditorOpts {
 }
 
 fn get_dir() -> PathBuf {
-    env::temp_dir().join("cargo-playground")
+    env::var_os("CARGO_PLAYGROUND_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| env::temp_dir().join("cargo-playground"))
 }
 
 fn main() {
@@ -72,12 +77,9 @@ fn run() -> error::Result<()> {
     };
 
     match opts {
-        PlaygroundOpts::New(opts) => {
-            new::new(opts)?;
-        }
-        PlaygroundOpts::Open(opts) => {
-            open::open(opts)?;
-        }
+        PlaygroundOpts::New(opts) => new::new(opts),
+        PlaygroundOpts::Open(opts) => open::open(opts),
+        PlaygroundOpts::Clean(opts) => clean::clean(opts),
         PlaygroundOpts::Ls => {
             let path = get_dir();
             if !path.exists() {
@@ -92,8 +94,8 @@ fn run() -> error::Result<()> {
                     }
                 }
             }
+
+            Ok(())
         }
     }
-
-    Ok(())
 }
