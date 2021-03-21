@@ -98,15 +98,4 @@ This lists all the playgrounds.
 If you want to add specific for some editor or environment feel free to
 open a PR!
 
-## Troubleshooting
-
-### When using tmux `cd /tmp/cargo-playground/<playground> && /path/to/cargo-playground watch <playground>` is added to shell history
-
-This tool relies on sending commands to different tmux panes, but adds a
-space before the commands to prevent it from adding to the shell history.
-
-Check what the `HISTCONTROL` variable is set to. If it is not set to
-`ignorespace` or `ignoreboth`, then commands starting with a space will
-be added to the history.
-
 #### Credits to Sergey Potalov and his post [Rust Playground At Your Fingertips](https://www.greyblake.com/blog/2021-03-12-rust-playground-at-your-fingertips/) for the inspiration!

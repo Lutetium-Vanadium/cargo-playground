@@ -11,9 +11,7 @@ impl OpenBackend for Tmux {
     fn run(&mut self, mut path: PathBuf, name: &str, opts: EditorOpts) -> error::Result<()> {
         let self_path = env::current_exe()?;
         let watch_cmd = format!(
-            // Space is intentionally present to prevent this from going into shell history
-            " cd {} && {} watch {}",
-            path_to_str(&path, "playground")?,
+            "{} watch {}",
             path_to_str(&self_path, "cargo-playground")?,
             name
         );
@@ -21,9 +19,11 @@ impl OpenBackend for Tmux {
         #[rustfmt::skip]
         Command::new("tmux")
             .args(&[
-                "split-window", "-h", ";",           // Create a right pane,
-                "send-keys", &watch_cmd, "C-m", ";", // watch the project files
-                "select-pane", "-L",                 // and focus the editor
+                "split-window", "-h",
+                "-e", "HISTFILE=/dev/null",              // prevent command from going into history
+                "-c", path_to_str(&path, "playground")?,
+                &watch_cmd, ";",
+                "select-pane", "-L",
             ])
             .output()?;
 
@@ -39,10 +39,8 @@ impl OpenBackend for Tmux {
 
         #[rustfmt::skip]
         Command::new("tmux").args(&[
-            "select-pane", "-R", ";",                     // Select the right pane
-            "send-keys", "C-c", " tmux kill-pane", "C-m", // and kill it
-            //                   ^-- Space is intentionally present to prevent this from going into
-            //                       shell history
+            "select-pane", "-R", ";", // Select the right pane
+            "send-keys", "C-c",       // and kill it
         ]).output()?;
 
         Ok(())
