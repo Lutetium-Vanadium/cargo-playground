@@ -82,6 +82,16 @@ It has the following options and flags:
 
 This lists all the playgrounds.
 
+#### `cargo playground clean`
+
+Deletes the Cargo projects in the playground directory.
+
+It has the following options:
+```
+ -m, --matches <matches> A regex to match against playground names. If
+                         not given all will be deleted.
+```
+
 ## Support
 
 - Terminal based editor + tmux: It opens a pane to the right which has
