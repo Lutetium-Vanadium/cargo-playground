@@ -2,6 +2,7 @@
 //
 // It has been copied here so cargo-playground can be used without cargo-watch needing to be
 // installed
+use crossterm::style::Styler;
 use std::path::MAIN_SEPARATOR;
 use watchexec::{
     cli::{Args, ArgsBuilder},
@@ -54,10 +55,7 @@ impl<'a> CwHandler<'a> {
     }
 
     fn start(&self) {
-        println!(
-            "project: {}",
-            ansi_term::Style::new().bold().paint(self.project_id)
-        );
+        println!("project: {}", self.project_id.bold());
     }
 }
 

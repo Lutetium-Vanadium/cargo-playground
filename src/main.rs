@@ -55,9 +55,6 @@ fn get_dir() -> PathBuf {
 }
 
 fn main() {
-    #[cfg(target_os = "windows")]
-    ansi_term::enable_ansi_support();
-
     match run() {
         Ok(()) => {}
         Err(e) => eprintln!("{}", e),
@@ -86,7 +83,7 @@ fn run() -> error::Result<()> {
                 return Ok(());
             }
 
-            for entry in get_dir().read_dir()? {
+            for entry in path.read_dir()? {
                 // ignoring errors for now, maybe do something about it?
                 if let Ok(entry) = entry {
                     if let Some(name) = entry.file_name().to_str() {
