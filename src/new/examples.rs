@@ -1,3 +1,4 @@
+use crate::helpers;
 use std::io::BufRead;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -90,6 +91,15 @@ impl Examples {
         Ok(Some(Examples {
             path: examples_path,
             examples,
+        }))
+    }
+
+    pub fn pick_one(self) -> crossterm::Result<Option<PathBuf>> {
+        let Self { examples, mut path } = self;
+        let pick = helpers::pick_from("Pick an example:", &examples)?;
+        Ok(pick.map(|i| {
+            path.push(&examples[i]);
+            path
         }))
     }
 }

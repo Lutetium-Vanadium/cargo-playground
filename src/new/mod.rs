@@ -7,7 +7,6 @@ use std::{fmt, fs, io};
 use structopt::StructOpt;
 
 mod examples;
-mod pick_from;
 
 use examples::Examples;
 
@@ -99,23 +98,34 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
         stop.store(true, atomic::Ordering::Relaxed);
         let _ = loader.join();
 
-        // do not propagate error until loading thread has joined
-        let example = pick_from::pick_from(examples?).map_err(|err| {
-            error::Error::new(
-                io::ErrorKind::Other,
-                format!("couldn't pick template: {}", err),
-            )
-        })?;
+        match examples {
+            Ok(examples) => {
+                let example = examples.pick_one().map_err(|err| {
+                    error::Error::new(
+                        io::ErrorKind::Other,
+                        format!("couldn't pick template: {}", err),
+                    )
+                })?;
 
-        if example.is_none() {
-            return Ok(());
+                if example.is_none() {
+                    return Ok(());
+                }
+
+                path.pop();
+                path.push("src");
+                path.push("main.rs");
+
+                fs::copy(&example.unwrap(), &path)?;
+            }
+            Err(err) => {
+                eprintln!("{}", err);
+                match helpers::pick_from("Do you want to continue anyway?", &["Yes", "No"]) {
+                    // Selected 'Yes'
+                    Ok(Some(0)) => {}
+                    _ => return Ok(()),
+                }
+            }
         }
-
-        path.pop();
-        path.push("src");
-        path.push("main.rs");
-
-        fs::copy(&example.unwrap(), &path)?;
     }
 
     for dep in opts.deps {
