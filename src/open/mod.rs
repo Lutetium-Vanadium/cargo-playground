@@ -42,10 +42,10 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
     }
 
     if opts.gui {
-        println!("opening project: {}", opts.name);
+        helpers::print_status("Opening", &opts.name);
         gui::Gui::new(opts.no_w).run(path, &opts.name, opts.editor_opts)
     } else if env::var_os("TMUX").is_some() {
-        println!("opening project: {}", opts.name);
+        helpers::print_status("Opening", &opts.name);
         tmux::Tmux.run(path, &opts.name, opts.editor_opts)
     } else {
         Err(error::Error::new(

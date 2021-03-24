@@ -1,4 +1,4 @@
-use crossterm::style::Colorize;
+use crossterm::style::{Colorize, Styler};
 use crossterm::{cursor, terminal};
 use std::io::Write;
 use std::path::PathBuf;
@@ -34,4 +34,15 @@ pub fn loader(prompt: &'static str, stop: Arc<atomic::AtomicBool>) -> thread::Jo
         )
         .unwrap();
     })
+}
+
+const STATUS_NAME_WIDTH: usize = 12;
+
+pub fn print_status(status_name: &str, status: &str) {
+    println!(
+        "{:>status_name_width$} {}",
+        status_name.dark_green().bold(),
+        status,
+        status_name_width = STATUS_NAME_WIDTH
+    );
 }
