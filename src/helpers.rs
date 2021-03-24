@@ -21,6 +21,8 @@ pub fn loader(prompt: &'static str, stop: Arc<atomic::AtomicBool>) -> thread::Jo
         const STATES: [char; 6] = ['⠷', '⠯', '⠟', '⠻', '⠽', '⠾'];
         let mut state = 0;
         let mut stdout = io::stdout();
+
+        crossterm::execute!(stdout, cursor::Hide).unwrap();
         // it is ok if the old value is gotten as it will get new value next time
         while !stop.load(atomic::Ordering::Relaxed) {
             write!(stdout, "\r{} {}", STATES[state].cyan(), prompt).unwrap();
@@ -33,6 +35,7 @@ pub fn loader(prompt: &'static str, stop: Arc<atomic::AtomicBool>) -> thread::Jo
             stdout,
             terminal::Clear(terminal::ClearType::CurrentLine),
             cursor::MoveToColumn(0),
+            cursor::Show,
         )
         .unwrap();
     })
