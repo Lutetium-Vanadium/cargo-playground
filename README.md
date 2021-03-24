@@ -51,13 +51,15 @@ This creates and opens a new playground.
 
 It has the following options and flags:
 ```
- -g, --gui             Indicates the editor is a GUI based
- --no-w                Do not pass -w flag when opening GUI editor
- -n, --name <name>     The name of the playground. By default it is
-                       generated from the current timestamp
- -e, --editor <editor> The editor to open the project in. By default it
-                       is taken from the VISUAL env variable.
- -a, --args <args>...  Args to be given to be supplied to the editor.
+ -g, --gui                 Indicates the editor is a GUI based
+ --no-w                    Do not pass -w flag when opening GUI editor
+ -n, --name <name>         The name of the playground. By default it is
+                           generated from the current timestamp
+ -e, --editor <editor>     The editor to open the project in. By default
+                           it is taken from the VISUAL env variable.
+ -a, --args <args>...      Args to be given to be supplied to the editor.
+ -t, --template <template> A dependency to take examples from as a base
+                           for main.rs. Same format as dependencies.
 ```
 
 It also takes a list of dependencies in the following formats:

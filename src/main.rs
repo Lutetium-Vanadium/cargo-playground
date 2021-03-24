@@ -1,9 +1,8 @@
-use std::env;
-use std::path::PathBuf;
 use structopt::StructOpt;
 
 mod clean;
 mod error;
+mod helpers;
 mod new;
 mod open;
 mod watch;
@@ -48,16 +47,7 @@ struct EditorOpts {
     pub args: Vec<String>,
 }
 
-fn get_dir() -> PathBuf {
-    env::var_os("CARGO_PLAYGROUND_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| env::temp_dir().join("cargo-playground"))
-}
-
 fn main() {
-    #[cfg(target_os = "windows")]
-    ansi_term::enable_ansi_support();
-
     match run() {
         Ok(()) => {}
         Err(e) => eprintln!("{}", e),
@@ -81,12 +71,12 @@ fn run() -> error::Result<()> {
         PlaygroundOpts::Open(opts) => open::open(opts),
         PlaygroundOpts::Clean(opts) => clean::clean(opts),
         PlaygroundOpts::Ls => {
-            let path = get_dir();
+            let path = helpers::get_dir();
             if !path.exists() {
                 return Ok(());
             }
 
-            for entry in get_dir().read_dir()? {
+            for entry in path.read_dir()? {
                 // ignoring errors for now, maybe do something about it?
                 if let Ok(entry) = entry {
                     if let Some(name) = entry.file_name().to_str() {

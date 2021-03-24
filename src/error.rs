@@ -1,4 +1,4 @@
-use ansi_term::{Color, Style};
+use crossterm::style::{Colorize, Styler};
 use std::{error, fmt, io};
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -38,20 +38,10 @@ impl From<io::Error> for Error {
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}: {}",
-            Style::new().bold().fg(Color::Red).paint("error"),
-            self.internal
-        )?;
+        write!(f, "{}: {}", "error".dark_red().bold(), self.internal)?;
 
         if let Some(help) = self.help {
-            write!(
-                f,
-                "\n {}: {}",
-                Style::new().bold().fg(Color::Yellow).paint("help"),
-                help,
-            )?;
+            write!(f, "\n {}: {}", "help".dark_yellow().bold(), help,)?;
         }
 
         Ok(())

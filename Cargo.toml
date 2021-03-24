@@ -8,6 +8,6 @@ edition = "2018"
 # FIXME: use derive from clap 3 instead of structopt when it comes out of beta
 structopt = "0.3"
 watchexec = "1.14.1"
-# FIXME: upgrade to latest version when clap 3 comes out of beta
-ansi_term = "0.11" # Old version, but this is used by clap 2.33
+crossterm = "0.19"
 regex = "1.4.5"
+home = "0.5"

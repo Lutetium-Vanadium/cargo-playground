@@ -1,4 +1,4 @@
-use crate::error;
+use crate::{error, helpers};
 use std::path::{Path, PathBuf};
 use std::{env, io};
 use structopt::StructOpt;
@@ -27,7 +27,7 @@ pub struct OpenOpts {
 }
 
 pub fn open(opts: OpenOpts) -> error::Result<()> {
-    let mut path = super::get_dir();
+    let mut path = helpers::get_dir();
     path.push(&opts.name); // Now represents playground path
 
     if !opts.skip_check && !path.is_dir() {
@@ -42,10 +42,10 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
     }
 
     if opts.gui {
-        println!("opening project: {}", opts.name);
+        helpers::print_status("Opening", &opts.name);
         gui::Gui::new(opts.no_w).run(path, &opts.name, opts.editor_opts)
     } else if env::var_os("TMUX").is_some() {
-        println!("opening project: {}", opts.name);
+        helpers::print_status("Opening", &opts.name);
         tmux::Tmux.run(path, &opts.name, opts.editor_opts)
     } else {
         Err(error::Error::new(
