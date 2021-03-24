@@ -1,4 +1,4 @@
-use crate::error;
+use crate::{error, helpers};
 use std::fs;
 use structopt::StructOpt;
 
@@ -10,7 +10,7 @@ pub struct CleanOpts {
 }
 
 pub fn clean(opts: CleanOpts) -> error::Result<()> {
-    let path = super::get_dir();
+    let path = helpers::get_dir();
 
     if !path.exists() {
         return Ok(());

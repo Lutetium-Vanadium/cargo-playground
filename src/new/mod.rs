@@ -1,10 +1,9 @@
-use crate::{error, open};
-use crossterm::style::Colorize;
+use crate::{error, helpers, open};
 use std::io::Write;
 use std::process::{Command, Stdio};
 use std::sync::{atomic, Arc};
-use std::time::{Duration, SystemTime};
-use std::{fmt, fs, io, thread};
+use std::time::SystemTime;
+use std::{fmt, fs, io};
 use structopt::StructOpt;
 
 mod examples;
@@ -54,7 +53,7 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
 
     println!("creating new project: {}", name);
 
-    let mut path = super::get_dir();
+    let mut path = helpers::get_dir();
     path.push(&name); // Now represents the playground directory
 
     if !Command::new("cargo")
@@ -76,7 +75,7 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
 
     if let Some(ref template) = opts.template {
         let stop = Arc::new(false.into());
-        let loader = loader(Arc::clone(&stop));
+        let loader = helpers::loader("fetching examples", Arc::clone(&stop));
 
         let dep = Dep::try_parse(&template)?;
         writeln!(cargo_toml, "{}", dep)?;
@@ -159,27 +158,4 @@ impl fmt::Display for Dep<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} = \"{}\"", self.dep_name, self.dep_ver)
     }
-}
-
-#[inline]
-fn loader(stop: Arc<atomic::AtomicBool>) -> thread::JoinHandle<()> {
-    thread::spawn(move || {
-        const STATES: [char; 6] = ['⠷', '⠯', '⠟', '⠻', '⠽', '⠾'];
-        let mut state = 0;
-        let mut stdout = io::stdout();
-        // it is ok if the old value is gotten as it will get new value next time
-        while !stop.load(atomic::Ordering::Relaxed) {
-            write!(stdout, "\r{} fetching examples", STATES[state].cyan()).unwrap();
-            stdout.flush().unwrap();
-            state = (state + 1) % STATES.len();
-            thread::sleep(Duration::from_millis(200));
-        }
-
-        crossterm::execute!(
-            stdout,
-            crossterm::terminal::Clear(crossterm::terminal::ClearType::CurrentLine),
-            crossterm::cursor::MoveToColumn(0),
-        )
-        .unwrap();
-    })
 }

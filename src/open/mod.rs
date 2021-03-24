@@ -1,4 +1,4 @@
-use crate::error;
+use crate::{error, helpers};
 use std::path::{Path, PathBuf};
 use std::{env, io};
 use structopt::StructOpt;
@@ -27,7 +27,7 @@ pub struct OpenOpts {
 }
 
 pub fn open(opts: OpenOpts) -> error::Result<()> {
-    let mut path = super::get_dir();
+    let mut path = helpers::get_dir();
     path.push(&opts.name); // Now represents playground path
 
     if !opts.skip_check && !path.is_dir() {
