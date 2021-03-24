@@ -98,6 +98,8 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
         stop.store(true, atomic::Ordering::Relaxed);
         let _ = loader.join();
 
+        path.pop();
+
         match examples {
             Ok(examples) => {
                 let example = examples.pick_one().map_err(|err| {
@@ -111,7 +113,6 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
                     return Ok(());
                 }
 
-                path.pop();
                 path.push("src");
                 path.push("main.rs");
 
@@ -122,7 +123,10 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
                 match helpers::pick_from("Do you want to continue anyway?", &["Yes", "No"]) {
                     // Selected 'Yes'
                     Ok(Some(0)) => {}
-                    _ => return Ok(()),
+                    _ => {
+                        fs::remove_dir_all(path)?;
+                        return Ok(());
+                    }
                 }
             }
         }
