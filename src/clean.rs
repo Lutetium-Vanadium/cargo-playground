@@ -21,14 +21,16 @@ pub fn clean(opts: CleanOpts) -> error::Result<()> {
             let regex = regex::RegexBuilder::new(&matches)
                 .case_insensitive(true)
                 .build()
-                .map_err(|err| error::Error::new(std::io::ErrorKind::InvalidInput, err))?;
+                .map_err(|err| {
+                    error::Error::new(std::io::ErrorKind::InvalidInput, err)
+                })?;
             Some(regex)
         }
         None => None,
     };
 
     // ignoring errors for now, maybe do something about it?
-    for entry in path.read_dir()?.filter_map(Result::ok) {
+    for entry in path.read_dir()?.flatten() {
         let mut path = entry.path();
 
         match (&regex, path.file_name().unwrap().to_str()) {

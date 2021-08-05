@@ -1,12 +1,21 @@
-use crossterm::style::{style, Attribute, Color, Print, PrintStyledContent, SetForegroundColor};
-use crossterm::style::{Colorize, Styler};
-use crossterm::{cursor, event, execute, queue, terminal};
-use std::convert::TryFrom;
-use std::io::Write;
-use std::path::PathBuf;
-use std::sync::{atomic, Arc};
-use std::time::Duration;
-use std::{env, io, thread};
+use std::{
+    convert::TryFrom,
+    env,
+    io::{self, Write},
+    path::PathBuf,
+    sync::{atomic, Arc},
+    thread,
+    time::Duration,
+};
+
+use crossterm::{
+    cursor, event, execute, queue,
+    style::{
+        style, Attribute, Color, Print, PrintStyledContent, SetAttribute, SetForegroundColor,
+        Stylize,
+    },
+    terminal,
+};
 
 /// Gets the path to directory in which playgrounds will be created.
 pub fn get_dir() -> PathBuf {
@@ -44,9 +53,13 @@ pub fn loader(prompt: &'static str, stop: Arc<atomic::AtomicBool>) -> thread::Jo
 const STATUS_NAME_WIDTH: usize = 12;
 
 pub fn print_status(status_name: &str, status: &str) {
-    println!(
-        "{:>status_name_width$} {}",
-        status_name.dark_green().bold(),
+    print!(
+        "{}{}{:>status_name_width$}{}{} {}",
+        SetForegroundColor(Color::DarkGreen),
+        SetAttribute(Attribute::Bold),
+        status_name,
+        SetForegroundColor(Color::Reset),
+        SetAttribute(Attribute::Reset),
         status,
         status_name_width = STATUS_NAME_WIDTH
     );

@@ -48,9 +48,8 @@ struct EditorOpts {
 }
 
 fn main() {
-    match run() {
-        Ok(()) => {}
-        Err(e) => eprintln!("{}", e),
+    if let Err(e) = run() {
+        eprintln!("{}", e);
     }
 }
 
@@ -76,12 +75,10 @@ fn run() -> error::Result<()> {
                 return Ok(());
             }
 
-            for entry in path.read_dir()? {
-                // ignoring errors for now, maybe do something about it?
-                if let Ok(entry) = entry {
-                    if let Some(name) = entry.file_name().to_str() {
-                        println!("{}", name);
-                    }
+            // ignoring errors for now, maybe do something about it?
+            for entry in path.read_dir()?.flatten() {
+                if let Some(name) = entry.file_name().to_str() {
+                    println!("{}", name);
                 }
             }
 

@@ -51,6 +51,7 @@ pub fn new(opts: NewOpts) -> error::Result<()> {
     };
 
     helpers::print_status("Creating", &name);
+    println!();
 
     let mut path = helpers::get_dir();
     path.push(&name); // Now represents the playground directory

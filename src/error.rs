@@ -1,5 +1,6 @@
-use crossterm::style::{Colorize, Styler};
 use std::{error, fmt, io};
+
+use crossterm::style::Stylize;
 
 pub type Result<T> = std::result::Result<T, Error>;
 

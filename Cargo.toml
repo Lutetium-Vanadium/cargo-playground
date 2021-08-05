@@ -1,13 +1,13 @@
 [package]
 name = "cargo-playground"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Lutetium Vanadium"]
 edition = "2018"
 
 [dependencies]
 # FIXME: use derive from clap 3 instead of structopt when it comes out of beta
 structopt = "0.3"
-watchexec = "1.14.1"
-crossterm = "0.19"
+watchexec = "1.17"
+crossterm = "0.20"
 regex = "1.4.5"
 home = "0.5"

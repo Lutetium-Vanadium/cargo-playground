@@ -2,13 +2,14 @@
 //
 // It has been copied here so cargo-playground can be used without cargo-watch needing to be
 // installed
-use crossterm::style::Styler;
-use std::path::MAIN_SEPARATOR;
+use std::{path::MAIN_SEPARATOR, time::Duration};
+
+use crossterm::style::Stylize;
 use watchexec::{
-    cli::{Args, ArgsBuilder},
+    config::{Config, ConfigBuilder},
     error::Result,
     pathop::PathOp,
-    run::{ExecHandler, Handler},
+    run::{ExecHandler, Handler, OnBusyUpdate},
 };
 
 pub struct CwHandler<'a> {
@@ -17,7 +18,7 @@ pub struct CwHandler<'a> {
 }
 
 impl Handler for CwHandler<'_> {
-    fn args(&self) -> Args {
+    fn args(&self) -> Config {
         self.inner.args()
     }
 
@@ -35,8 +36,8 @@ impl Handler for CwHandler<'_> {
 }
 
 impl<'a> CwHandler<'a> {
-    pub fn new(mut args: Args, project_id: &'a str) -> Result<Self> {
-        let mut cmd = args.cmd.join(" && ");
+    pub fn new(mut config: Config, project_id: &'a str) -> Result<Self> {
+        let mut cmd = config.cmd.join(" && ");
 
         #[cfg(unix)]
         cmd.push_str("; echo [Finished running. Exit status: $?]");
@@ -46,11 +47,11 @@ impl<'a> CwHandler<'a> {
         cmd.push_str(" ; echo [Finished running]");
         // ^ could be wrong depending on the platform, to be fixed on demand
 
-        args.cmd = vec![cmd];
+        config.cmd = vec![cmd];
 
         Ok(Self {
             project_id,
-            inner: ExecHandler::new(args)?,
+            inner: ExecHandler::new(config)?,
         })
     }
 
@@ -83,13 +84,13 @@ pub fn watch(project_id: &str) {
         format!("*{s}target{s}**", s = MAIN_SEPARATOR),
     ];
 
-    let args = ArgsBuilder::default()
-        .restart(true)
+    let args = ConfigBuilder::default()
+        .on_busy_update(OnBusyUpdate::Restart)
         .clear_screen(true)
         .run_initially(true)
         .no_environment(true)
-        .poll_interval(500u32)
-        .debounce(500u32)
+        .poll_interval(Duration::from_millis(500))
+        .debounce(Duration::from_millis(500))
         .paths(vec![".".into()])
         .ignores(ignores)
         .cmd(vec!["cargo run -q".into()])

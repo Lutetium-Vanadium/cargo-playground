@@ -33,7 +33,7 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
     if !opts.skip_check && !path.is_dir() {
         return Err(error::Error::new(
             io::ErrorKind::NotFound,
-            format!("could not find playground with name {:?}", path),
+            format!("could not find playground with at {:?}", path),
         )
         .with_help(
             "use `cargo playground ls` to list available playgrounds
@@ -52,7 +52,7 @@ pub fn open(opts: OpenOpts) -> error::Result<()> {
             io::ErrorKind::Other,
             "currently only terminals running tmux are supported",
         )
-        .with_help("try using the --force flag with a GUI editor"))
+        .with_help("try using the --gui flag with a GUI editor"))
     }
 }
 
